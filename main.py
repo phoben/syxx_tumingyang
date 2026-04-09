@@ -28,6 +28,9 @@ CHAPTER_COMPLETE = "complete"      # 场景完成（全部章节）
 # 自动切换等待时间
 AUTO_NEXT_DELAY = 3000  # 3秒后自动切换下一章
 
+# 勋章点亮后返回主页延迟时间
+RETURN_TO_MAIN_DELAY = 1500  # 1.5秒后返回主页
+
 
 # 场景到勋章的映射
 SCENE_BADGE_MAP = {
@@ -77,6 +80,8 @@ class Game:
         # 勋章动画
         self.award_animation = None
         self.game_paused = False  # 动画期间暂停其他交互
+        self.return_to_main_timer = 0  # 返回主页延迟计时器
+        self.pending_return_to_main = False  # 是否在等待返回主页
 
         # 播放主界面背景音乐
         self._play_scene_bgm("main")
@@ -417,18 +422,31 @@ class Game:
 
     def update(self):
         """更新游戏状态"""
+        # 等待返回主页期间
+        if self.pending_return_to_main:
+            # 继续更新徽章动画（让点亮动画播放完）
+            for badge in self.badges.values():
+                badge.update()
+            # 检查计时器
+            if pygame.time.get_ticks() - self.return_to_main_timer >= RETURN_TO_MAIN_DELAY:
+                self.pending_return_to_main = False
+                self.game_paused = False
+                self._return_to_main()
+            return
+
         # 勋章动画期间暂停其他更新
         if self.award_animation and self.award_animation.is_running():
             self.award_animation.update()
             if self.award_animation.is_done():
-                # 动画完成：点亮勋章、播放音效、返回主页
+                # 动画完成：点亮勋章、播放音效、启动返回延迟
                 badge_name = self.award_animation.badge_id
                 game_state.badges[badge_name] = True
                 self.badges[badge_name].light_up()
                 audio_manager.play_sfx("sfx/badge_light.mp3")
                 self.award_animation = None
-                self.game_paused = False
-                self._return_to_main()
+                # 进入等待返回状态
+                self.return_to_main_timer = pygame.time.get_ticks()
+                self.pending_return_to_main = True
             return
 
         dt = self.clock.get_time()  # 获取上一帧时间（毫秒）
