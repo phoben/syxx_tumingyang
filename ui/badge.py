@@ -110,9 +110,3 @@ class Badge:
         scaled = pygame.transform.scale(image, new_size)
         rect = scaled.get_rect(center=self.pos)
         screen.blit(scaled, rect)
-
-        # 点亮时添加发光效果
-        if self.lit and not self.animating:
-            pygame.draw.circle(screen, (255, 215, 0),
-                             (self.pos[0], self.pos[1]),
-                             self.size[0] // 2 + 3, 2)
