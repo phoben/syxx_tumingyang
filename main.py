@@ -299,6 +299,9 @@ class Game:
             return
         scene.set_guide_state("point")  # 切换回指向姿态
         self._stop_speech()
+        # 先切换到下一章
+        scene.next_chapter()
+        # 再使用新的章节索引切换背景
         scene.change_chapter_background(scene.current_chapter_index, self.screen, self.clock)
         self._play_chapter_speech()
         self.chapter_state = CHAPTER_PLAYING
