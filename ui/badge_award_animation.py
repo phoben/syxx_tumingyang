@@ -40,6 +40,9 @@ class BadgeAwardAnimation:
             badge_id: 勋章标识
             badge_image: 勋章点亮状态的图片 (pygame.Surface)
         """
+        if badge_image is None or not isinstance(badge_image, pygame.Surface):
+            raise ValueError("badge_image 必须是有效的 pygame.Surface 对象")
+
         self.badge_id = badge_id
         self.image = badge_image
 
@@ -71,7 +74,7 @@ class BadgeAwardAnimation:
 
     def update(self):
         """更新动画状态"""
-        if self.state == self.STATE_IDLE or self.state == self.STATE_DONE:
+        if self.state in (self.STATE_IDLE, self.STATE_DONE):
             return
 
         elapsed = pygame.time.get_ticks() - self.start_time
@@ -117,16 +120,18 @@ class BadgeAwardAnimation:
 
     def draw(self, screen):
         """绘制动画"""
-        if self.state == self.STATE_IDLE or self.state == self.STATE_DONE:
+        if self.state in (self.STATE_IDLE, self.STATE_DONE):
             return
 
         # 缩放图片
         original_size = self.image.get_size()
         new_size = (int(original_size[0] * self.scale), int(original_size[1] * self.scale))
-        scaled = pygame.transform.scale(self.image, new_size)
 
-        # 旋转图片
-        rotated = pygame.transform.rotate(scaled, self.rotation)
+        try:
+            scaled = pygame.transform.scale(self.image, new_size)
+            rotated = pygame.transform.rotate(scaled, self.rotation)
+        except pygame.error:
+            return
 
         # 绘制到当前位置（居中对齐）
         rect = rotated.get_rect(center=self.pos)
