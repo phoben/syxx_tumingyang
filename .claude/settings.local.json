@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import pygame; img=pygame.image.load\\('assets/images/backgrounds/dialog_box.png'\\); print\\(f'Dialog box size: {img.get_size\\(\\)}'\\)\")",
+      "Bash(timeout 10 python main.py)"
+    ]
+  }
+}
