@@ -438,15 +438,22 @@ class Game:
         if self.award_animation and self.award_animation.is_running():
             self.award_animation.update()
             if self.award_animation.is_done():
-                # 动画完成：点亮勋章、播放音效、启动返回延迟
+                # 动画完成：点亮勋章、播放音效
                 badge_name = self.award_animation.badge_id
                 game_state.badges[badge_name] = True
                 self.badges[badge_name].light_up()
                 audio_manager.play_sfx("sfx/badge_light.mp3")
                 self.award_animation = None
-                # 进入等待返回状态
-                self.return_to_main_timer = pygame.time.get_ticks()
-                self.pending_return_to_main = True
+
+                # 检测是否集齐4枚勋章，触发彩蛋场景
+                if game_state.check_game_complete():
+                    # 集齐所有勋章，进入彩蛋场景
+                    self.game_paused = False
+                    self.change_scene("ending")
+                else:
+                    # 未集齐，返回主页
+                    self.return_to_main_timer = pygame.time.get_ticks()
+                    self.pending_return_to_main = True
             return
 
         dt = self.clock.get_time()  # 获取上一帧时间（毫秒）
@@ -477,10 +484,6 @@ class Game:
 
         # 检查自动切换计时器
         self._check_auto_next_timer()
-
-        # 检查游戏完成
-        if game_state.check_game_complete() and current != "ending":
-            self.change_scene("ending")
 
     def draw(self):
         """绘制游戏画面"""
