@@ -316,8 +316,9 @@ class Game:
         scene = self.scenes.get(game_state.current_scene)
         if scene:
             if scene.is_last_chapter():
-                # 最后一章，完成场景
-                self._complete_scene()
+                # 最后一章，用户手动点击完成按钮 -> 直接返回主页，不触发勋章动画
+                # 勋章点亮只通过自动播放完毕触发（见 _update_speech_progress）
+                self._return_to_main()
             else:
                 # 切换到下一章，保持指向姿态
                 old_index = scene.current_chapter_index
@@ -386,8 +387,7 @@ class Game:
         """切换静音状态"""
         muted = self.sound_toggle.toggle()
         audio_manager.set_mute(muted)
-        if muted:
-            self._stop_speech()
+        # 静音只影响背景音乐，不打断解说语音
 
     def _play_scene_bgm(self, scene_name):
         """播放场景背景音乐"""
