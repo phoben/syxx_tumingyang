@@ -101,7 +101,7 @@ class NarrativeBubble:
     def _load_chapter_text(self, chapter: Chapter):
         """加载章节完整解说词"""
         if chapter and chapter.text_file:
-            text_path = os.path.join("minimax-output", chapter.text_file)
+            text_path = chapter.text_file  # 直接使用传入的路径
             if os.path.exists(text_path):
                 try:
                     with open(text_path, 'r', encoding='utf-8') as f:
