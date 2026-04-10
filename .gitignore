@@ -9,6 +9,7 @@ __pycache__/
 
 # Claude Code 配置目录
 .claude/
+CLAUDE.md
 
 # IDE 配置
 .vscode/
@@ -20,8 +21,7 @@ docs/
 
 # 测试文件
 test_log.md
-minimax-output/test_chinese.mp3
-minimax-output/txt/
+minimax-output
 
 # 操作系统文件
 .DS_Store
