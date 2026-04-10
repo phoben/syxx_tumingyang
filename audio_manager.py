@@ -8,8 +8,8 @@ class AudioManager:
     """音频管理器 - 管理背景音乐和语音播放"""
 
     # 淡入淡出时间常量（毫秒）
-    FADE_IN_DURATION = 2000   # 淡入2秒
-    FADE_OUT_DURATION = 2000  # 淡出2秒
+    FADE_IN_DURATION = 800   # 淡入0.8秒
+    FADE_OUT_DURATION = 800  # 淡出0.8秒
 
     def __init__(self):
         """初始化音频管理器"""

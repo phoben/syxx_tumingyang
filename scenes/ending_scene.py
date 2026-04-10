@@ -3,18 +3,19 @@ import pygame
 from .base_scene import BaseScene
 from config import SCREEN_WIDTH, SCREEN_HEIGHT, CHINESE_FONT_PATH
 
-# 彩蛋场景专用字体尺寸（大号）
-ENDING_FONT_SIZE = 48
+# 彩蛋场景专用字体尺寸
+ENDING_FONT_SIZE = 24
 
-# 描边参数
-OUTLINE_COLOR = (220, 20, 60)  # 红色描边
-OUTLINE_WIDTH = 3  # 描边宽度（像素）
+# 阴影参数
+SHADOW_COLOR = (50, 50, 50)  # 深灰色阴影
+SHADOW_OFFSET = 2  # 阴影偏移像素
+TEXT_COLOR = (255, 255, 255)  # 白色文字
 
 # 滚动速度（像素/帧）
 SCROLL_SPEED = 1.5
 
 # 行间距（像素）
-LINE_HEIGHT = 60
+LINE_HEIGHT = 40
 
 
 class EndingScene(BaseScene):
@@ -37,45 +38,45 @@ class EndingScene(BaseScene):
             "感谢您的红色征程之旅！",
             "",
             "",
-            "╔══════════════════════════╗",
-            "║      制 作 团 队        ║",
-            "╚══════════════════════════╝",
+            "═══════════════════════════════",
+            "制 作 团 队",
+            "═══════════════════════════════",
             "",
             "项目创意：涂明洋",
             "编程开发：涂明洋的姑爷",
             "",
             "",
-            "╔══════════════════════════╗",
-            "║     AI 工 具 支 持       ║",
-            "╚══════════════════════════╝",
+            "═══════════════════════════════",
+            "AI 工 具 支 持",
+            "═══════════════════════════════",
             "",
-            "语音合成：MiniMax",
-            "音乐生成：MiniMax",
-            "图片生成：谷歌 / 豆包",
-            "文本生成：GLM",
+            "语音合成：MiniMax-speech-2.8-hd",
+            "音乐生成：MiniMax-Music2.6",
+            "图片生成：Gemini-2-pro+Seedream-5.0",
+            "文本生成：GLM-5.1",
             "编码平台：VS Code + Claude Code",
             "",
             "",
-            "╔══════════════════════════╗",
-            "║       技 术 栈           ║",
-            "╚══════════════════════════╝",
+            "═══════════════════════════════",
+            "技 术 栈",
+            "═══════════════════════════════",
             "",
             "编程语言：Python",
             "游戏框架：Pygame",
             "运行平台：小鹿AI编程APP",
             "",
             "",
-            "╔══════════════════════════╗",
-            "║      特 别 感 谢         ║",
-            "╚══════════════════════════╝",
+            "═══════════════════════════════",
+            " 特 别 感 谢",
+            "═══════════════════════════════",
             "",
             "罗田县实验小学",
+            "余老师",
             "四（13）班全体同学",
             "",
-            "",
-            "╔══════════════════════════╗",
-            "║      致 敬 先 辈         ║",
-            "╚══════════════════════════╝",
+            "═══════════════════════════════",
+            " 致 敬 先 辈",
+            "═══════════════════════════════",
             "",
             "1921 · 南湖红船 · 党的诞生",
             "1949 · 开国大典 · 民族新生",
@@ -90,20 +91,12 @@ class EndingScene(BaseScene):
             "",
             "",
             "",
-            "═════════════════════════════",
-            "",
-            "         THE END",
-            "",
-            "═════════════════════════════",
+            "═══════════════════════════════",
+            "THE END",
+            "═══════════════════════════════",
             "",
             "",
-            "",  # 底部空行，滚动后可循环
-            "",  # 循环缓冲区
-            "",
-            "",
-            "",  # 重复开头，实现无缝循环
-            "",
-            "感谢您的红色征程之旅！",
+
         ]
 
         # 加载大号中文字体
@@ -134,9 +127,9 @@ class EndingScene(BaseScene):
         if self.scroll_y + self.total_height < -100:
             self.scroll_y = SCREEN_HEIGHT + 100
 
-    def _render_text_with_outline(self, screen, text, center_pos):
+    def _render_text_with_shadow(self, screen, text, center_pos):
         """
-        绘制带描边的文字
+        绘制带阴影的文字
 
         Args:
             screen: 屏幕 Surface
@@ -146,23 +139,13 @@ class EndingScene(BaseScene):
         if not text:
             return
 
-        text_color = (255, 215, 0)  # 金色文字
+        # 先绘制阴影层
+        shadow_surface = self.font.render(text, True, SHADOW_COLOR)
+        shadow_rect = shadow_surface.get_rect(center=center_pos)
+        screen.blit(shadow_surface, (shadow_rect.x + SHADOW_OFFSET, shadow_rect.y + SHADOW_OFFSET))
 
-        # 8个方向的偏移，模拟粗描边效果
-        offsets = []
-        for dx in range(-OUTLINE_WIDTH, OUTLINE_WIDTH + 1):
-            for dy in range(-OUTLINE_WIDTH, OUTLINE_WIDTH + 1):
-                if dx != 0 or dy != 0:
-                    offsets.append((dx, dy))
-
-        # 先绘制描边
-        for dx, dy in offsets:
-            outline_surface = self.font.render(text, True, OUTLINE_COLOR)
-            outline_rect = outline_surface.get_rect(center=center_pos)
-            screen.blit(outline_surface, (outline_rect.x + dx, outline_rect.y + dy))
-
-        # 最后绘制文字本体
-        text_surface = self.font.render(text, True, text_color)
+        # 再绘制白色文字
+        text_surface = self.font.render(text, True, TEXT_COLOR)
         text_rect = text_surface.get_rect(center=center_pos)
         screen.blit(text_surface, text_rect)
 
@@ -179,4 +162,4 @@ class EndingScene(BaseScene):
             # 只绘制在屏幕可见范围内的行
             if -LINE_HEIGHT < line_y < SCREEN_HEIGHT + LINE_HEIGHT:
                 center_pos = (center_x, line_y)
-                self._render_text_with_outline(screen, line, center_pos)
+                self._render_text_with_shadow(screen, line, center_pos)

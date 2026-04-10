@@ -2,6 +2,7 @@
 import pygame
 import sys
 import os
+import argparse
 from config import *
 from state import game_state
 from audio_manager import audio_manager
@@ -44,7 +45,7 @@ SCENE_BADGE_MAP = {
 class Game:
     """游戏主类"""
 
-    def __init__(self):
+    def __init__(self, start_scene=None):
         pygame.init()
         pygame.mixer.init()
 
@@ -83,8 +84,17 @@ class Game:
         self.return_to_main_timer = 0  # 返回主页延迟计时器
         self.pending_return_to_main = False  # 是否在等待返回主页
 
-        # 播放主界面背景音乐
-        self._play_scene_bgm("main")
+        # 测试模式：直接进入指定场景
+        if start_scene and start_scene in self.scenes:
+            print(f"[测试模式] 直接进入场景: {start_scene}")
+            game_state.current_scene = start_scene
+            self.scenes[start_scene].on_enter()
+            self._play_scene_bgm(start_scene)
+            if start_scene != "main" and start_scene != "ending":
+                self._start_narrative()
+        else:
+            # 播放主界面背景音乐
+            self._play_scene_bgm("main")
 
     def _init_font(self):
         """初始化字体"""
@@ -532,7 +542,14 @@ class Game:
 
 def main():
     """程序入口"""
-    game = Game()
+    # 解析命令行参数
+    parser = argparse.ArgumentParser(description='时光列车：驶向强国梦')
+    parser.add_argument('--scene', '-s',
+                        choices=['main', 'redboat', 'founding', 'reform', 'space', 'ending'],
+                        help='直接进入指定场景（测试模式）')
+    args = parser.parse_args()
+
+    game = Game(start_scene=args.scene)
     game.run()
 
 

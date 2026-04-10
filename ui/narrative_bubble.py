@@ -207,8 +207,8 @@ class NarrativeBubble:
         """获取上一个按钮矩形"""
         # 按钮在对话框底部
         button_y = dialog_y + self.DIALOG_HEIGHT - 25 - self.BUTTON_HEIGHT // 2
-        # 按钮在文本区域左侧
-        button_x = dialog_x + self.TEXT_AREA_OFFSET_X + 50
+        # 按钮在文本区域左侧外部
+        button_x = dialog_x + self.TEXT_AREA_OFFSET_X - 30
         return pygame.Rect(button_x - self.BUTTON_WIDTH // 2, button_y - self.BUTTON_HEIGHT // 2,
                           self.BUTTON_WIDTH, self.BUTTON_HEIGHT)
 
@@ -216,8 +216,8 @@ class NarrativeBubble:
         """获取下一个按钮矩形"""
         # 按钮在对话框底部
         button_y = dialog_y + self.DIALOG_HEIGHT - 25 - self.BUTTON_HEIGHT // 2
-        # 按钮在文本区域右侧
-        button_x = dialog_x + self.TEXT_AREA_OFFSET_X + self.TEXT_AREA_WIDTH - 50
+        # 按钮在文本区域右侧外部
+        button_x = dialog_x + self.TEXT_AREA_OFFSET_X + self.TEXT_AREA_WIDTH + 30
         return pygame.Rect(button_x - self.BUTTON_WIDTH // 2, button_y - self.BUTTON_HEIGHT // 2,
                           self.BUTTON_WIDTH, self.BUTTON_HEIGHT)
 
@@ -289,22 +289,29 @@ class NarrativeBubble:
             line_height = self.FONT_SIZE_TEXT + 8
             max_lines = (text_area.height - 30) // line_height  # 减去进度条空间
 
-            # 绘制文本
+            # 绘制文本（带阴影效果）
             text_y = text_area.y
+            shadow_offset = 2  # 阴影偏移像素
+            shadow_color = (50, 50, 50)  # 深灰色阴影
             for line in lines[:max_lines]:
-                text_surface = self.font.render(line, True, BLACK)
+                # 先绘制阴影层
+                shadow_surface = self.font.render(line, True, shadow_color)
+                screen.blit(shadow_surface, (text_area.x + shadow_offset, text_y + shadow_offset))
+                # 再绘制白色文字
+                text_surface = self.font.render(line, True, WHITE)
                 screen.blit(text_surface, (text_area.x, text_y))
                 text_y += line_height
 
             # 绘制进度条（底部）
             if self.speech_status:
                 progress_y = dialog_y + self.DIALOG_HEIGHT - 50
-                progress_width = text_area.width
-                progress_rect = pygame.Rect(text_area.x, progress_y, progress_width, 12)
+                progress_width = text_area.width - 160  # 缩短进度条，留出按钮空间
+                progress_x = text_area.x + 80  # 进度条起点向右偏移，居中显示
+                progress_rect = pygame.Rect(progress_x, progress_y, progress_width, 12)
                 pygame.draw.rect(screen, GRAY, progress_rect, border_radius=4)
                 if self.speech_progress > 0:
                     filled_width = int(progress_width * self.speech_progress / 100)
-                    filled_rect = pygame.Rect(text_area.x, progress_y, filled_width, 12)
+                    filled_rect = pygame.Rect(progress_x, progress_y, filled_width, 12)
                     pygame.draw.rect(screen, YELLOW, filled_rect, border_radius=4)
 
             # 不绘制页码

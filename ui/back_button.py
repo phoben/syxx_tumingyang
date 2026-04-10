@@ -7,7 +7,7 @@ from config import IMAGES_DIR, SCREEN_WIDTH, SCREEN_HEIGHT, CHINESE_FONT_PATH, F
 class BackButton:
     """返回主页按钮组件"""
 
-    def __init__(self, pos=None, size=(140, 40)):
+    def __init__(self, pos=None, size=(170, 50)):
         """
         初始化返回按钮
 
